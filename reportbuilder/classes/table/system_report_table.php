@@ -19,6 +19,7 @@ declare(strict_types=1);
 namespace core_reportbuilder\table;
 
 use action_menu;
+use action_menu_filler;
 use core_table\local\filter\filterset;
 use html_writer;
 use moodle_exception;
@@ -223,9 +224,22 @@ class system_report_table extends base_report_table {
 
         $menu = new action_menu();
         $menu->set_menu_trigger($OUTPUT->pix_icon('a/setting', get_string('actions', 'core_reportbuilder')));
-        foreach ($this->report->get_actions() as $action) {
-            // Ensure the action link can be displayed for the current row.
-            $actionlink = $action->get_action_link($row);
+        $actions = $this->report->get_actions();
+        $actionlink = null;
+        foreach ($actions as $position => $action) {
+            // Allow fillers to be added to the actions menu.
+            if ($action instanceof action_menu_filler) {
+                // Avoid having filler on the first and last position and having multiple fillers in a row.
+                if ($actionlink == null
+                    || $actionlink instanceof action_menu_filler
+                    || array_key_last($actions) == $position) {
+                    continue;
+                }
+                $actionlink = $action;
+            } else {
+                // Ensure the action link can be displayed for the current row.
+                $actionlink = $action->get_action_link($row);
+            }
             if ($actionlink) {
                 $menu->add($actionlink);
             }

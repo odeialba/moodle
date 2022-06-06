@@ -18,6 +18,7 @@ declare(strict_types=1);
 
 namespace core_reportbuilder;
 
+use action_menu_filler;
 use coding_exception;
 use stdClass;
 use core_reportbuilder\local\models\report;
@@ -129,6 +130,18 @@ abstract class system_report extends base {
     }
 
     /**
+     * Adds divider/filler/separator to the report
+     *
+     * @param bool $primary
+     */
+    final public function add_divider(bool $primary = false): void {
+        $filler = new action_menu_filler();
+        $filler->primary = $primary;
+
+        $this->actions[] = $filler;
+    }
+
+    /**
      * Whether report has any actions
      *
      * @return bool
@@ -140,7 +153,7 @@ abstract class system_report extends base {
     /**
      * Return report actions
      *
-     * @return action[]
+     * @return action[]|action_menu_filler[]
      */
     final public function get_actions(): array {
         return $this->actions;
