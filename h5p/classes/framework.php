@@ -1739,8 +1739,41 @@ class framework implements H5PFrameworkInterface {
         // Get current language in Moodle.
         $language = get_html_lang_attribute_value(strtolower(\current_language()));
 
+        // Validate language with H5P available languages.
+        $language = self::validate_language($language);
+
         // Try to map.
         return $map[$language] ?? $language;
+    }
+
+    /**
+     * Validate current Moodle language with valid H5P laguage codes and return a H5P valid language code.
+     *
+     * @param string $language Moodle language code
+     * @return string Language Code
+     */
+    public static function validate_language(string $language): string {
+        global $library;
+
+        if (empty($library)) {
+            return $language;
+        }
+
+        $explodedlibrary = explode(' ', $library);
+        $name = $explodedlibrary[0];
+        $version = $explodedlibrary[1];
+        $explodedversion = explode('.', $version);
+        $major = $explodedversion[0];
+        $minor = $explodedversion[1];
+
+        $editorframework = new \core_h5p\editor_framework();
+        $availablelanguages = $editorframework->getAvailableLanguages($name, $major, $minor);
+
+        while (!in_array($language, $availablelanguages) && strpos($language, '-') !== false) {
+            $language = substr($language, 0, strrpos($language, '-', -1));
+        }
+
+        return $language;
     }
 
     /**
