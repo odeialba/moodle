@@ -435,3 +435,26 @@ Feature: Manage custom reports
       | Javascript Object Notation (.json) |
       | OpenDocument (.ods)                |
       | Portable Document Format (.pdf)    |
+
+  Scenario: Warning on unsaved form when tab is changing
+    When I log in as "admin"
+    And I navigate to "Reports > Report builder > Custom reports" in site administration
+    And I click on "New report" "button"
+    And I set the following fields in the "New report" "dialogue" to these values:
+      | Name                  | Report1              |
+      | Report source         | Issued certificates  |
+      | Include default setup | 1                    |
+    And I click on "Save" "button" in the "New report" "dialogue"
+    And I click on the "Audience" dynamic tab
+    And I click on "Add audience 'All users'" "link"
+    And I click on the "Access" dynamic tab
+    Then I should see "You have made changes. Are you sure you want to navigate away and lose your changes?" in the "Changes made" "dialogue"
+    And I click on "Cancel" "button" in the "Changes made" "dialogue"
+    And I should see "Audience" in the ".active" "css_element"
+    And I click on the "Access" dynamic tab
+    And I should see "You have made changes. Are you sure you want to navigate away and lose your changes?" in the "Changes made" "dialogue"
+    And I click on "Confirm" "button" in the "Changes made" "dialogue"
+    And I should see "Access" in the ".active" "css_element"
+    And I click on the "Audience" dynamic tab
+    And "Changes made" "dialogue" should not exist
+    And I should see "Audience" in the ".active" "css_element"

@@ -867,6 +867,16 @@ EOF;
                             return "";
                         }
 
+                        if (Array.isArray(M.util.pending_js)) {
+                            var allowed = ["hidden.bs.tab", "shown.bs.tab"];
+                            var hiddenCount = M.util.pending_js.filter(function(x) { return x === "hidden.bs.tab"; }).length;
+                            var shownCount = M.util.pending_js.filter(function(x) { return x === "shown.bs.tab"; }).length;
+                            var unexpected = M.util.pending_js.some(function(x) { return allowed.indexOf(x) === -1; });
+                            if (!unexpected && hiddenCount === shownCount) {
+                                return "";
+                            }
+                        }
+
                         return M.util.pending_js.join(":");
                     })()'));
                 $pending = self::evaluate_script_in_session($session, $jscode);
